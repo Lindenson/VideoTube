@@ -1,30 +1,25 @@
-package video
+package video.files
 
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.server.Directives.{complete, get, optionalHeaderValueByName, path}
 import akka.stream.IOResult
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
-import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
-import video.Controller.getClass
+import video.api.VideoStreamer
+import video.rest.Controller.getClass
 
 import java.io.File
 import scala.concurrent.Future
 
-object FileStreamer {
+class FileStreamer extends VideoStreamer {
 
   private val buffer: Int = 4048
   private val logger = LoggerFactory.getLogger(getClass)
   private val byteString: ByteString = ByteString(0x12.toByte, 0x34.toByte)
-
-  private val appConfig = ConfigFactory.load("application.conf")
-  private val dirWithVideo: String = appConfig.getString("akka.videoDir")
-
   
-  def stream(rangeHeader: String, orderId: Int): HttpResponse = {
-    val file: File = getFile(orderId)
+  override def stream(rangeHeader: String, orderId: Int): HttpResponse = {
+    val file: File = getFileToStream(orderId)
     val fileSize: Long = file.length()
     val (start: Int, end: Long, contentLength: Long) = getSize(rangeHeader, fileSize)
 
@@ -55,10 +50,4 @@ object FileStreamer {
     .mapMaterializedValue(_ => Future.successful(IOResult.createSuccessful(2)))
 
   private def ifMobile(end: Long) = end == 1
-
-  private def getFile(orderId: Int) = {
-    val n = orderId % 6 + 1
-    val path = s"$dirWithVideo/$n.mp4"
-    new File(path)
-  }
 }

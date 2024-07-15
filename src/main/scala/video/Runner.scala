@@ -4,6 +4,7 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import org.slf4j.LoggerFactory
+import video.rest.Controller
 
 import java.net.NetworkInterface
 import scala.jdk.CollectionConverters.*
