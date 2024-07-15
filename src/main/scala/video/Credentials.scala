@@ -9,6 +9,7 @@ import com.typesafe.config.ConfigFactory
 import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
 import spray.json.DefaultJsonProtocol.*
 import video.FileUploader.clientFileUpload
+import video.VideoRepository.findUser
 
 import java.time.{Clock, Instant}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,11 +20,9 @@ private val appConfig = ConfigFactory.load("application.conf")
 private val secretKey: String = appConfig.getString("akka.secretKey")
 private val tokenExpiration: Int = appConfig.getString("akka.tokenExpiration").toInt
 
-
 case class User(username: String, password: String)
 
 case class UserToken(token: String)
-
 
 trait UserProtocol {
 
@@ -34,14 +33,13 @@ trait UserProtocol {
 }
 
 implicit val clock: Clock = Clock.systemUTC()
+
 private def checkCredentials(user: User): Future[Option[JwtClaim]] = {
-  Future {
-    //toDO Database
-    if (user.username == "admin" && user.password == "admin") {
+  findUser(user).map {
+    case Some(_) =>
       Some(JwtClaim(subject = Some(user.username)).issuedNow.expiresIn(tokenExpiration))
-    } else {
+    case None =>
       None
-    }
   }
 }
 
@@ -53,13 +51,14 @@ private def checkCredentialsAndGenerateToken(user: User): Future[Option[String]]
 
 private def checkTokenAndGo(authHeader: String, action: Route) = {
   val token = authHeader.substring("Bearer ".length)
-  Jwt.decode(token, secretKey, Seq(JwtAlgorithm.HS256)) match
+  Jwt.decode(token, secretKey, Seq(JwtAlgorithm.HS256)) match {
     case Failure(_) => complete(StatusCodes.Unauthorized)
     case Success(claim) =>
       isTokenValid(claim) match {
         case Some(true) => clientFileUpload
         case _ => complete(StatusCodes.Unauthorized, "Token not valid")
       }
+  }
 }
 
 def isTokenValid(claim: JwtClaim): Option[Boolean] =

@@ -10,11 +10,15 @@ scalaVersion := "3.4.2"
 
 javacOptions ++= Seq("-source", "11", "-target", "11")
 
+resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.6",
-  "com.typesafe.akka" %% "akka-stream" % "2.8.6",
-  "com.typesafe.akka" %% "akka-http" % "10.5.3",
-  "com.typesafe.akka" %% "akka-http-spray-json" % "10.5.3",
+  "com.lightbend.akka" %% "akka-stream-alpakka-slick" % "8.0.0",
+  "org.postgresql" % "postgresql" % "42.7.3",
+  "com.typesafe.akka" %% "akka-actor-typed" % "2.9.3",
+  "com.typesafe.akka" %% "akka-stream" % "2.9.3",
+  "com.typesafe.akka" %% "akka-http" % "10.6.3",
+  "com.typesafe.akka" %% "akka-http-spray-json" % "10.6.3",
   "com.github.jwt-scala" %% "jwt-core" % "10.0.1",
   "com.github.jwt-scala" %% "jwt-circe" % "10.0.1",
   "org.slf4j" % "slf4j-simple" % "1.7.36"
