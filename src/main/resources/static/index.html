@@ -9,12 +9,14 @@
 </head>
 <body>
 <div id="app" class="container-fluid d-flex flex-column h-100 p-0">
-    <div class="header w-100">
+    <div class="header d-md-block d-none w-100" style="align-items: center">
         <div class="triangle"></div>
         <h1>Basket Tube</h1>
     </div>
     <div class="d-md-none">
         <nav class="navbar navbar-dark bg-dark">
+            <div class="triangle"></div>
+            <h1>Basket Tube</h1>
             <button class="navbar-toggler" type="button" data-toggle="collapse"
                     data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -23,8 +25,8 @@
         <div class="collapse" id="navbarContent">
             <div class="bg-dark p-4">
                 <ul class="nav flex-column">
-                    <li class="nav-item"><a href="#">Login</a></li>
-                    <li class="nav-item"><a href="#">Upload Video</a></li>
+                    <li class="nav-item"><a href="#" @click.prevent="showLoginForm">Login</a></li>
+                    <li class="nav-item"><a href="#" @click.prevent="showUploadFileForm">Upload Video</a></li>
                     <li class="nav-item"><a href="#">Find Video</a></li>
                 </ul>
             </div>
@@ -34,8 +36,8 @@
     <div class="row flex-grow-1 m-0">
         <div class="d-md-block d-none col-2 p-0">
             <div class="sidebar d-flex flex-column">
-                <a href="#">Login</a>
-                <a href="#">Upload Video</a>
+                <a href="#" @click.prevent="showLoginForm">Login</a>
+                <a href="#" @click.prevent="showUploadFileForm">Upload Video</a>
                 <a href="#">Find Video</a>
             </div>
         </div>
@@ -53,23 +55,14 @@
     <footer class="w-100 text-left">
         <p>&copy; 2024 Miguel</p>
     </footer>
+    <login-modal @login="handleLogin"></login-modal>
+    <upload-file-modal @upload="handleFileUpload"></upload-file-modal>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-<script>
-    new Vue({
-        el: '#app',
-        data: {
-            videos: [
-                {id: 1, src: 'files/1'},
-                {id: 2, src: 'files/2'},
-                {id: 3, src: 'files/3'},
-                {id: 4, src: 'files/4'},
-                {id: 5, src: 'files/5'},
-                {id: 6, src: 'files/6'}
-            ]
-        }
-    });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="static/login.js"></script>
+<script src="static/upload.js"></script>
+<script src="static/startup.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
