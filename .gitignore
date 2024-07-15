@@ -1,0 +1,51 @@
+# SBT-specific
+target/
+project/target/
+project/project/
+
+# IntelliJ IDEA-specific
+.idea/
+*.iml
+*.iws
+.idea_modules/
+.idea_modules/*
+
+# Eclipse-specific
+.classpath
+.project
+.settings/
+
+# VS Code-specific
+.vscode/
+
+# Mac-specific
+.DS_Store
+
+# Linux-specific
+*~
+
+# Windows-specific
+Thumbs.db
+
+# Log files
+*.log
+
+# Scala-specific
+*.class
+*.cache
+*.log
+*.project
+*.scala_dependencies
+*.swp
+*.swo
+
+# Plugin-specific (optional)
+# If you are using a plugin, uncomment and edit the following lines to match your configuration.
+# sbt plugin example:
+# .bloop/
+# .metals/
+# .bsp/
+
+# Others
+*.bak
+*.tmp

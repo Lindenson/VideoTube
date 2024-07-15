@@ -18,8 +18,6 @@ object Streamer {
 
   private val appConfig = ConfigFactory.load("application.conf")
   private val dirWithVideo: String = appConfig.getString("akka.videoDir")
-  private val source = scala.io.Source.fromFile(s"$dirWithVideo/index.html")
-  private val page = try source.mkString finally source.close()
   private val logger = LoggerFactory.getLogger(getClass)
   private val byteString: ByteString = ByteString(0x12.toByte, 0x34.toByte)
   private val buffer: Int = 4048
@@ -28,10 +26,13 @@ object Streamer {
   val route: Route =
     concat(
       pathPrefix("files" / IntNumber)(getStream),
-      path("") {
-        get {
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, page))
-        }
+      get {
+        pathSingleSlash {
+          getFromResource("static/index.html")
+        } ~
+          path("static" / Remaining) { resource =>
+            getFromResource(s"static/$resource")
+          }
       }
     )
 
