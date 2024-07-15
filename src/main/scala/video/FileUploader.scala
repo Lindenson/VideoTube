@@ -3,6 +3,7 @@ package video
 import akka.Done
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.*
+import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.FileIO
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -17,7 +18,7 @@ object FileUploader {
   private val dirWithVideo: String = appConfig.getString("akka.videoDir")
   private val logger = LoggerFactory.getLogger(getClass)
 
-  def clientFileUpload = {
+  def clientFileUpload: Route = {
     extractRequestContext { ctx =>
       implicit val materializer = ctx.materializer
       fileUpload("file") {

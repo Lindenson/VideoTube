@@ -34,8 +34,9 @@ Vue.component('upload-file-modal', {
                   <label for="file">Choose file</label>
                   <input type="file" id="file" ref="file" class="form-control" @change="checkFileType" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Upload</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary" :disabled="isLoading">Upload</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" :disabled="isLoading">Cancel</button>
+                <div v-if="isLoading" class="loading-spinner"></div>
               </form>
             </div>
           </div>
@@ -48,7 +49,9 @@ Vue.component('upload-file-modal', {
             file: null,
             tagOptions: ['sport', 'home', 'friends'],
             selectedTag: '',
-            fileTypeError: false
+            fileTypeError: false,
+            fileSizeError: false,
+            isLoading: false
         };
     },
     methods: {
@@ -58,15 +61,18 @@ Vue.component('upload-file-modal', {
         checkFileType(event) {
             const file = event.target.files[0];
             this.fileTypeError = file.type !== 'video/mp4';
+            this.fileSizeError = file.size > 20000000; // 20 MB limit
         },
         async submitForm() {
             if (this.fileTypeError) {
-                alert('Only MPEG4 files are allowed.');
+                this.$emit('upload', 'Only MPEG4 files are allowed.');
+                return;
+            }
+            if (this.fileSizeError) {
+                this.$emit('upload', 'File size should not exceed 20MB.');
                 return;
             }
             const file = this.$refs.file.files[0];
-
-            console.log(file, this.fileName, this.selectTag)
 
                 if (file && this.fileName && this.selectTag) {
                 const formData = new FormData();
@@ -75,6 +81,7 @@ Vue.component('upload-file-modal', {
                 formData.append('tag', this.selectedTag);
 
                 try {
+                    this.isLoading = true;
                     let token = localStorage.getItem('jwt');
                     const response = await axios.post('/upload', formData, {
                         headers: {
@@ -85,17 +92,23 @@ Vue.component('upload-file-modal', {
 
                     if (file.size === response.data) {
                         renewVideoTags();
-                        this.$emit('upload', response.data);
+                        this.$emit('upload', `Uploaded ${response.data} bites`);
                     }
 
-                    $('#uploadFileModal').modal('hide');
-
                 } catch (error) {
-                    console.error('File upload failed:', error);
-                    alert('File upload failed. Please try again.');
+                    if(error.response.status === 401) {
+                        this.$emit('upload', `Only authorized user can upload!`);
+                    }
+                    else {
+                        this.$emit('upload', `File upload failed.`);
+                    }
+                }
+                finally {
+                    this.isLoading = false;
+                    $('#uploadFileModal').modal('hide');
                 }
             } else {
-                alert('Please complete all fields.');
+                    this.$emit('upload', `Please complete all fields.`);
             }
         }
     }

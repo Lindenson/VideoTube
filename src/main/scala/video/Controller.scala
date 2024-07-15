@@ -15,7 +15,8 @@ import scala.util.{Failure, Success}
 object Controller extends SprayJsonSupport with UserProtocol {
 
   implicit val clock: Clock = Clock.systemUTC()
-  private val secretKey = "secretKey"
+  private val secretKey = "mishaAdmin"
+  private val uploadLimit = 1000000000
 
 
   val route: Route =
@@ -45,7 +46,7 @@ object Controller extends SprayJsonSupport with UserProtocol {
         }
       },
       path("upload") {
-        withSizeLimit(1000000000) {
+        withSizeLimit(uploadLimit) {
           post {
             optionalHeaderValueByName("Authorization") {
               case Some(authHeader) if authHeader.startsWith("Bearer ") =>

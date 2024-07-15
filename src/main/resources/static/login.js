@@ -21,6 +21,7 @@ Vue.component('login-modal', {
                                 </div>
                                 <button type="submit" class="btn btn-primary">Login</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <div v-if="isLoading" class="loading-spinner"></div>
                             </form>
                         </div>
                     </div>
@@ -43,12 +44,10 @@ Vue.component('login-modal', {
 
                 const token = response.data.token;
                 localStorage.setItem('jwt', token);
-
-                this.$emit('login', this.username);
+                this.$emit('login', `Success: ${this.username}`);
 
             } catch (error) {
-                console.error('Login failed:', error);
-                alert('Login failed. Please check your credentials.');
+                this.$emit('login', 'Password or name is wrong');
             }
             finally {
                 $('#loginModal').modal('hide');

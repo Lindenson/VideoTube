@@ -18,7 +18,8 @@
             <div class="triangle"></div>
             <h1>Basket Tube</h1>
             <button class="navbar-toggler" type="button" data-toggle="collapse"
-                    data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
         </nav>
@@ -57,6 +58,20 @@
     </footer>
     <login-modal @login="handleLogin"></login-modal>
     <upload-file-modal @upload="handleFileUpload"></upload-file-modal>
+    <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
+    <div class="toast hide custom-toast" role="alert" aria-live="assertive" aria-atomic="true" v-for="(toast, index) in toasts"
+             :key="index" ref="toasts" data-delay="5000">
+            <div class="toast-header">
+                <strong class="mr-auto">{{ toast.title }}</strong>
+                <button type="button" class="ml-2 mb-1 close" @click="removeToast(index)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                {{ toast.body }}
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
