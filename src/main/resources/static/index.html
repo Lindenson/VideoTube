@@ -46,11 +46,15 @@
         </div>
         <div class="col-12 col-md-10 d-flex flex-column main-content p-0">
             <div class="row flex-grow-1 m-0">
-                <div v-for="video in videos" :key="video.id" class="col-6 col-lg-4 video-wrapper">
-                    <video loop muted playsinline controls>
+                <div v-for="video in videos" :key="video.id" class="col-6 col-lg-4 video-wrapper d-flex flex-column align-items-center">
+                    <video loop playsinline>
                         <source :src="video.src" type="video/mp4">
                         Update your browser to one from XXI century
                     </video>
+                    <div class="video-details text-center mt-2">
+                        <p class="vtag">{{ video.tag }}</p>
+                        <p class="vname">{{ video.name }}</p>
+                    </div>
                 </div>
             </div>
         </div>

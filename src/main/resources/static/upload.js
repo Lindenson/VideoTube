@@ -124,5 +124,6 @@ function renewVideoTags() {
         const newSrc = `${originalSrc}?t=${currentTime}`;
         source.setAttribute('src', newSrc);
         videos[i].load();
+        videos[i].pause();
     }
 }
