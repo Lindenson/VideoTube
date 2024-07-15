@@ -1,12 +1,12 @@
 package video.files
 
 import akka.http.scaladsl.model.*
-import akka.http.scaladsl.model.headers.RawHeader
 import akka.stream.IOResult
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import org.slf4j.LoggerFactory
 import video.api.VideoStreamer
+import video.dto.FileSize
 import video.rest.Controller.getClass
 
 import java.io.File
@@ -17,25 +17,20 @@ class FileStreamer extends VideoStreamer {
   private val buffer: Int = 4048
   private val logger = LoggerFactory.getLogger(getClass)
   private val byteString: ByteString = ByteString(0x12.toByte, 0x34.toByte)
-  
-  override def stream(rangeHeader: String, orderId: Int): HttpResponse = {
-    val file: File = getFileToStream(orderId)
+
+  override def stream(rangeHeader: String, fileName: String): (Source[ByteString, Future[IOResult]], FileSize) = {
+    val file: File = new File(fileName)
     val fileSize: Long = file.length()
     val (start: Int, end: Long, contentLength: Long) = getSize(rangeHeader, fileSize)
+    logger.info(s"streaming: $start-$end/$contentLength")
+    (getSource(file, start, end), FileSize(start, end, fileSize))
+  }
 
-    val headers = List(
-      RawHeader("content-range", s"bytes $start-$end/$fileSize"),
-      RawHeader("cache-control", "public, max-age=31536000"),
-      RawHeader("Accept-Ranges", "bytes")
-    )
-
+  private def getSource(file: File, start: Int, end: Long) = {
     val fileSource: Source[ByteString, Future[IOResult]] =
       if (ifMobile(end)) getTwoBiteSource
       else FileIO.fromPath(file.toPath, buffer, start)
-
-    val responseEntity = HttpEntity(MediaTypes.`video/mp4`, fileSource)
-    logger.info(s"streaming: $start-$end/$contentLength")
-    HttpResponse(StatusCodes.PartialContent, headers, responseEntity)
+    fileSource
   }
 
   private def getSize(rangeHeader: String, fileSize: Long) = {

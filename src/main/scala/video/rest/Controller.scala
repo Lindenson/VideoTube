@@ -1,26 +1,22 @@
 package video.rest
 
-import akka.event.Logging
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.model.StatusCodes.InternalServerError
 import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import org.slf4j.LoggerFactory
-import video.api.VideoStreamer
 import video.dto.{User, UserProtocol, UserToken}
 import video.security.{checkCredentialsAndGenerateToken, checkTokenAndGo}
 
 object Controller extends SprayJsonSupport with UserProtocol {
 
   private val logger = LoggerFactory.getLogger(getClass)
-  private val streamer: VideoStreamer = VideoStreamer.getStreamer
-  private val uploader = VideoUploader.getUploader.upload
 
   val route: Route =
     handleExceptions(exceptionHandler) {
       concat(
-        pathPrefix("files" / IntNumber)(validateRangeAndStream),
+        pathPrefix("files" / IntNumber)(streamVideo),
         get {
           pathSingleSlash {
             getFromResource("static/index.html")
@@ -43,7 +39,7 @@ object Controller extends SprayJsonSupport with UserProtocol {
           post {
             optionalHeaderValueByName("Authorization") {
               case Some(authHeader) if authHeader.startsWith("Bearer ") =>
-                checkTokenAndGo(authHeader, uploader)
+                checkTokenAndGo(authHeader, uploadVideo)
               case _ => complete(StatusCodes.Unauthorized)
             }
           }
@@ -62,20 +58,6 @@ object Controller extends SprayJsonSupport with UserProtocol {
           complete(HttpResponse(InternalServerError, entity = "Some error"))
         }
     }
-
-  private def validateRangeAndStream(orderId: Int): Route =
-    concat(
-      pathEnd {
-        concat(
-          get {
-            logRequest("GET-VIDEO", Logging.InfoLevel) {
-              optionalHeaderValueByName("Range") {
-                case None => complete(StatusCodes.RangeNotSatisfiable)
-                case Some(range) => complete(streamer.stream(range, orderId))
-              }
-            }
-          })
-      })
 }
 
 

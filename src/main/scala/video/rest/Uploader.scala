@@ -14,7 +14,6 @@ import video.api.VideoWriter
 
 import scala.util.{Failure, Success}
 
-class FileUploader extends VideoUploader {
 
   private val appConfig = ConfigFactory.load("application.conf")
   private val uploadLimit: Long = appConfig.getString("akka.uploadLimit").toLong
@@ -22,7 +21,7 @@ class FileUploader extends VideoUploader {
 
   private val videoWriter = VideoWriter.getWriter
 
-  override def upload: Route = {
+  def uploadVideo: Route = {
     withSizeLimit(uploadLimit) {
       formFields("fileName", "tag") { (fileName, tag) =>
         extractRequestContext { ctx =>
@@ -51,4 +50,4 @@ class FileUploader extends VideoUploader {
     if (contentType.mediaType != MediaTypes.`video/mp4`)
       complete(StatusCodes.UnsupportedMediaType, "Only MPEG4 files are allowed.")
   }
-}
+

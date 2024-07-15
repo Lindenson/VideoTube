@@ -7,6 +7,13 @@ CREATE TABLE users (
     password VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE videos (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR NOT NULL,
+    filename VARCHAR NOT NULL,
+    tag VARCHAR NOT NULL
+);
+
 INSERT INTO users (username, password) VALUES ('admin', 'misha');
 EOSQL
 
