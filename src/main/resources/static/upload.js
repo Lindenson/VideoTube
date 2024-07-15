@@ -51,7 +51,7 @@ Vue.component('upload-file-modal', {
             selectedTag: '',
             fileTypeError: false,
             fileSizeError: false,
-            isLoading: false
+            isLoading: false,
         };
     },
     methods: {

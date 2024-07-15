@@ -65,8 +65,8 @@
     <login-modal @login="handleLogin"></login-modal>
     <upload-file-modal @upload="handleFileUpload"></upload-file-modal>
     <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
-    <div class="toast hide custom-toast" role="alert" aria-live="assertive" aria-atomic="true" v-for="(toast, index) in toasts"
-             :key="index" ref="toasts" data-delay="5000">
+    <div class="toast hide" :class="[toastType ? 'good-toast' : 'bad-toast']" role="alert" aria-live="assertive"
+         aria-atomic="true" v-for="(toast, index) in toasts" :key="index" ref="toasts" data-delay="5000">
             <div class="toast-header">
                 <strong class="mr-auto">{{ toast.title }}</strong>
                 <button type="button" class="ml-2 mb-1 close" @click="removeToast(index)">

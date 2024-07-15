@@ -82,8 +82,13 @@ h1 {
     text-decoration: none;
 }
 
-.toast.custom-toast {
-    background-color: #e8bb0c; /* Бордовый цвет */
+.toast.good-toast {
+    background-color: #001a80; /* Бордовый цвет */
+    color: white;
+}
+
+.toast.bad-toast {
+    background-color: #981919; /* Бордовый цвет */
     color: white;
 }
 
