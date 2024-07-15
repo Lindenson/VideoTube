@@ -18,21 +18,21 @@ Vue.component('upload-file-modal', {
                 <div class="form-group">
                   <label>Tag</label>
                   <div>
-                    <button
+                    <button                      
                       v-for="tagOption in tagOptions"
                       :key="tagOption"
                       type="button"
                       class="btn btn-outline-primary"
-                      @click="selectTag(tagOption)"
-                      :class="{ active: tag === tagOption }"
+                      @click="selectTag(tagOption)"                      
+                      :class="{ active: tagOption === selectedTag }"                 
                     >
                       {{ tagOption }}
-                    </button>
+                        </button>
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="file">Choose file</label>
-                  <input type="file" id="file" ref="file" class="form-control" required>
+                  <input type="file" id="file" ref="file" class="form-control" @change="checkFileType" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Upload</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -45,31 +45,51 @@ Vue.component('upload-file-modal', {
     data() {
         return {
             fileName: '',
-            tag: '',
             file: null,
-            tagOptions: ['sport', 'home', 'friends']
+            tagOptions: ['sport', 'home', 'friends'],
+            selectedTag: '',
+            fileTypeError: false
         };
     },
     methods: {
-        selectTag(selectedTag) {
-            this.tag = selectedTag;
+        selectTag(tag) {
+            this.selectedTag = tag;
+        },
+        checkFileType(event) {
+            const file = event.target.files[0];
+            this.fileTypeError = file.type !== 'video/mp4';
         },
         async submitForm() {
+            if (this.fileTypeError) {
+                alert('Only MPEG4 files are allowed.');
+                return;
+            }
             const file = this.$refs.file.files[0];
-            if (file && this.fileName && this.tag) {
+
+            console.log(file, this.fileName, this.selectTag)
+
+                if (file && this.fileName && this.selectTag) {
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('fileName', this.fileName);
-                formData.append('tag', this.tag);
+                formData.append('tag', this.selectedTag);
 
                 try {
-                    const response = await axios.post('YOUR_BACKEND_URL_HERE', formData, {
+                    let token = localStorage.getItem('jwt');
+                    const response = await axios.post('/upload', formData, {
                         headers: {
-                            'Content-Type': 'multipart/form-data'
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${token}`
                         }
                     });
-                    this.$emit('upload', response.data);
+
+                    if (file.size === response.data) {
+                        renewVideoTags();
+                        this.$emit('upload', response.data);
+                    }
+
                     $('#uploadFileModal').modal('hide');
+
                 } catch (error) {
                     console.error('File upload failed:', error);
                     alert('File upload failed. Please try again.');
@@ -80,3 +100,16 @@ Vue.component('upload-file-modal', {
         }
     }
 });
+
+
+function renewVideoTags() {
+    const videos = document.getElementsByTagName('video');
+    for (let i = 0; i < videos.length; i++) {
+        const currentTime = new Date().getTime(); // Get current timestamp
+        const source = videos[i].getElementsByTagName('source')[0]
+        const originalSrc = source.src
+        const newSrc = `${originalSrc}?t=${currentTime}`;
+        source.setAttribute('src', newSrc);
+        videos[i].load();
+    }
+}

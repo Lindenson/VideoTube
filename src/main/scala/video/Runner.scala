@@ -18,7 +18,7 @@ object Runner {
 
     val localhost: String = getLocalIP.head
     logger.info(f"running service: $localhost:$port")
-    Http().newServerAt(localhost, port).bind(Streamer.route)
+    Http().newServerAt(localhost, port).bind(Controller.route)
   }
 
   private def getLocalIP: List[String] = {

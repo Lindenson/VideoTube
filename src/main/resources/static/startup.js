@@ -21,13 +21,11 @@ new Vue({
         showUploadFileForm() {
             $('#uploadFileModal').modal('show');
         },
-        handleLogin(credentials) {
-            alert(`Username: ${credentials.username}, Password: ${credentials.password}`);
-            // toDO
+        handleLogin(user) {
+            alert(`${user} logged in`);
         },
         handleFileUpload(file) {
-            alert(`File uploaded: ${file.name}`);
-            // toDO
+            alert(`Uploaded, transferred ${file} bites`);
         }
     }
 });

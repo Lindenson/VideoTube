@@ -34,9 +34,25 @@ Vue.component('login-modal', {
         };
     },
     methods: {
-        submitForm() {
-            this.$emit('login', { username: this.username, password: this.password });
-            $('#loginModal').modal('hide');
+        async submitForm() {
+            try {
+                const response = await axios.post('/login', {
+                    username: this.username,
+                    password: this.password
+                });
+
+                const token = response.data.token;
+                localStorage.setItem('jwt', token);
+
+                this.$emit('login', this.username);
+
+            } catch (error) {
+                console.error('Login failed:', error);
+                alert('Login failed. Please check your credentials.');
+            }
+            finally {
+                $('#loginModal').modal('hide');
+            }
         }
     }
 });
