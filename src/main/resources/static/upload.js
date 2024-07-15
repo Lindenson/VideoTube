@@ -97,7 +97,7 @@ Vue.component('upload-file-modal', {
 
                 } catch (error) {
                     if(error.response.status === 401) {
-                        this.$emit('upload', `Only authorized user can upload!`);
+                        this.$emit('upload', `Not authorized for upload`);
                     }
                     else {
                         this.$emit('upload', `File upload failed.`);

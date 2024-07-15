@@ -5,19 +5,14 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.*
 import akka.http.scaladsl.server.Directives.{complete, get, optionalHeaderValueByName, path, *}
 import akka.http.scaladsl.server.Route
-import pdi.jwt.{Jwt, JwtAlgorithm, JwtClaim}
+import com.typesafe.config.ConfigFactory
 import video.FileUploader.clientFileUpload
-
-import java.time.Clock
-import scala.util.{Failure, Success}
 
 
 object Controller extends SprayJsonSupport with UserProtocol {
 
-  implicit val clock: Clock = Clock.systemUTC()
-  private val secretKey = "mishaAdmin"
-  private val uploadLimit = 1000000000
-
+  private val appConfig = ConfigFactory.load("application.conf")
+  private val uploadLimit: Int = appConfig.getString("akka.uploadLimit").toInt
 
   val route: Route =
     concat(
@@ -30,17 +25,12 @@ object Controller extends SprayJsonSupport with UserProtocol {
             getFromResource(s"static/$resource")
           }
       },
-      post {
-        path("login") {
-          post {
-            entity(as[User]) { user =>
-              if (user.username == "admin" && user.password == "admin") {
-                val claim = JwtClaim(subject = Some(user.username)).issuedNow.expiresIn(3600)
-                val token = Jwt.encode(claim, secretKey, JwtAlgorithm.HS256)
-                complete(Token(token))
-              } else {
-                complete(StatusCodes.Unauthorized)
-              }
+      path("login") {
+        post {
+          entity(as[User]) { user =>
+            onSuccess(checkCredentialsAndGenerateToken(user)) {
+              case Some(token) => complete(UserToken(token))
+              case None => complete(StatusCodes.Unauthorized)
             }
           }
         }
@@ -50,10 +40,7 @@ object Controller extends SprayJsonSupport with UserProtocol {
           post {
             optionalHeaderValueByName("Authorization") {
               case Some(authHeader) if authHeader.startsWith("Bearer ") =>
-                val token = authHeader.substring("Bearer ".length)
-                Jwt.decode(token, secretKey, Seq(JwtAlgorithm.HS256)) match
-                  case Failure(_) => complete(StatusCodes.Unauthorized)
-                  case Success(claim) => clientFileUpload
+                checkTokenAndGo(authHeader, clientFileUpload)
               case _ => complete(StatusCodes.Unauthorized)
             }
           }
@@ -75,3 +62,6 @@ object Controller extends SprayJsonSupport with UserProtocol {
           })
       })
 }
+
+
+

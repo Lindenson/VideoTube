@@ -58,7 +58,7 @@ display: block;
 }
 
 .nav-item a {
-color: white !important;
+color: white;
 text-decoration: none !important;
 margin: 10px 0 !important;
 font-size: 1.2em !important;
@@ -102,6 +102,11 @@ color: white;
 }
 
 .toast.custom-toast {
-    background-color: #001a80; /* Бордовый цвет */
+    background-color: #e8bb0c; /* Бордовый цвет */
     color: white;
+}
+
+.disabled {
+    cursor: not-allowed;
+    color: darkgray!important;
 }
