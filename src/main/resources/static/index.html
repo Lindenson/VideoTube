@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-<div id="app" class="container-fluid d-flex flex-column h-100 p-0">
+<div id="app" class="container-fluid d-flex flex-column p-0">
     <div class="header d-md-block d-none w-100" style="align-items: center">
         <div class="triangle"></div>
         <h1>Basket Tube</h1>
@@ -27,7 +27,8 @@
             <div class="bg-dark p-4">
                 <ul class="nav flex-column">
                     <li class="nav-item"><a href="#" @click.prevent="showLoginForm">Login</a></li>
-                    <li class="nav-item"><a href="#" :class="{disabled: uploadDisabled}" @click.prevent="showUploadFileForm">Upload Video</a></li>
+                    <li class="nav-item"><a href="#" :class="{disabled: uploadDisabled}"
+                                            @click.prevent="showUploadFileForm">Upload Video</a></li>
                     <li class="nav-item"><a href="#">Find Video</a></li>
                     <li class="nav-item"><a href="#" @click.prevent="logout">Logout</a></li>
                 </ul>
@@ -46,7 +47,8 @@
         </div>
         <div class="col-12 col-md-10 d-flex flex-column main-content p-0">
             <div class="row flex-grow-1 m-0">
-                <div v-for="video in videos" :key="video.id" class="col-6 col-lg-4 video-wrapper d-flex flex-column align-items-center">
+                <div v-for="video in videos" :key="video.id"
+                     class="col-6 col-lg-4 video-wrapper d-flex flex-column align-items-center">
                     <video loop playsinline>
                         <source :src="video.src" type="video/mp4">
                         Update your browser to one from XXI century
@@ -59,14 +61,11 @@
             </div>
         </div>
     </div>
-    <footer class="w-100 text-left">
-        <p>&copy; 2024 Miguel</p>
-    </footer>
     <login-modal @login="handleLogin"></login-modal>
     <upload-file-modal @upload="handleFileUpload"></upload-file-modal>
     <div class="position-fixed bottom-0 right-0 p-3" style="z-index: 5; right: 0; bottom: 0;">
-    <div class="toast hide" :class="[toastType ? 'good-toast' : 'bad-toast']" role="alert" aria-live="assertive"
-         aria-atomic="true" v-for="(toast, index) in toasts" :key="index" ref="toasts" data-delay="5000">
+        <div class="toast hide" :class="[toastType ? 'good-toast' : 'bad-toast']" role="alert" aria-live="assertive"
+             aria-atomic="true" v-for="(toast, index) in toasts" :key="index" ref="toasts" data-delay="5000">
             <div class="toast-header">
                 <strong class="mr-auto">{{ toast.title }}</strong>
                 <button type="button" class="ml-2 mb-1 close" @click="removeToast(index)">
@@ -78,14 +77,26 @@
             </div>
         </div>
     </div>
+    <footer id="footer" class="d-100 d-flex justify-content-between">
+        <p style="margin: 0!important;">&copy; 2024 Miguel</p>
+        <nav aria-label="...">
+            <ul class="pagination pagination-sm">
+                <li @click="pageFirst" class="page-item"><a class="page-link" href="#" tabindex="-1">First</a></li>
+                <li @click="pageDown" class="page-item"><a class="page-link" href="#">Previous</a></li>
+                <li @click="pageUp" class="page-item" :class="{disabled: !existsMore}"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </footer>
 </div>
+<script src="static/adjust.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="static/login.js"></script>
 <script src="static/upload.js"></script>
 <script src="static/startup.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

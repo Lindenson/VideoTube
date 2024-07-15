@@ -21,33 +21,27 @@ private def getHeaders(fileSize: FileSize) = {
 }
 
 def streamVideo(fileID: Int): Route =
-  concat(
-    pathEnd {
-      concat(
-        get {
-          extractRequestContext { ctx =>
-            logRequest("GET-VIDEO", Logging.InfoLevel) {
-              optionalHeaderValueByName("Range") {
-                case None => complete(StatusCodes.RangeNotSatisfiable)
-                case Some(range) =>
-                  onComplete(nameFromID(fileID) (ctx.executionContext)) {
-                    case scala.util.Success(fileName) =>
-                      val (source, fileSize) = streamer.stream(range, fileName)
-                      val responseEntity = HttpEntity(MediaTypes.`video/mp4`, source)
-                      val entity = HttpResponse(StatusCodes.PartialContent, getHeaders(fileSize), responseEntity)
-                      complete(entity)
-                    case scala.util.Failure(exception) =>
-                      val response = HttpResponse(status = StatusCodes.InternalServerError,
-                        entity = s"An error occurred: ${exception.getMessage}")
-                      complete(response)
-                  }
+  pathEnd {
+    get {
+      extractRequestContext { ctx =>
+        logRequest("GET-VIDEO", Logging.InfoLevel) {
+          optionalHeaderValueByName("Range") {
+            case None => complete(StatusCodes.RangeNotSatisfiable)
+            case Some(range) =>
+              onComplete(nameFromID(fileID)(ctx.executionContext)) {
+                case scala.util.Success(fileName) =>
+                  val (source, fileSize) = streamer.stream(range, fileName)
+                  val responseEntity = HttpEntity(MediaTypes.`video/mp4`, source)
+                  val entity = HttpResponse(StatusCodes.PartialContent, getHeaders(fileSize), responseEntity)
+                  complete(entity)
+                case scala.util.Failure(exception) =>
+                  complete(HttpResponse(StatusCodes.InternalServerError, entity = s"An error occurred: ${exception.getMessage}"))
               }
-            }
           }
         }
-      )
+      }
     }
-  )
+  }
 
   
     
