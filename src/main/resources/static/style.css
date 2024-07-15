@@ -56,6 +56,14 @@
             display: block;
         }
 
+        .nav-item a {
+            color: white !important;
+            text-decoration: none !important;
+            margin: 10px 0 !important;
+            font-size: 1.2em !important;
+            display: block !important;
+        }
+
         .video-container video {
             width: 100%;
             height: auto;
