@@ -28,7 +28,7 @@ import scala.util.{Failure, Success}
           fileUpload("file") {
             case (metadata, fileStream) =>
               validateContentType(metadata)
-              onComplete(videoWriter.write(fileStream, fileName, tag)(ctx.materializer)) {
+              onComplete(videoWriter.write(fileStream, fileName, tag)(ctx.materializer, ctx.executionContext)) {
                 case Success(statusTry) => statusTry.status match {
                   case Success(Done) =>
                     val count = statusTry.count
@@ -36,7 +36,9 @@ import scala.util.{Failure, Success}
                     complete(StatusCodes.OK, s"$count")
                   case _ => complete(StatusCodes.InternalServerError -> statusTry.status)
                 }
-                case Failure(ex) => complete(StatusCodes.InternalServerError -> ex.toString)
+                case Failure(exception) =>
+                  logger.error(s"file upload exception $exception")
+                  complete(StatusCodes.InternalServerError -> exception.toString)
               }
           }
         }

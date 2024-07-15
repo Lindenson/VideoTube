@@ -1,6 +1,5 @@
 package video.files
 
-import akka.http.scaladsl.model.*
 import akka.stream.IOResult
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
@@ -20,17 +19,26 @@ class FileStreamer extends VideoStreamer {
 
   override def stream(rangeHeader: String, fileName: String): (Source[ByteString, Future[IOResult]], FileSize) = {
     val file: File = new File(fileName)
-    val fileSize: Long = file.length()
-    val (start: Int, end: Long, contentLength: Long) = getSize(rangeHeader, fileSize)
-    logger.info(s"streaming: $start-$end/$contentLength")
-    (getSource(file, start, end), FileSize(start, end, fileSize))
+    anyErrorWithFile(file) match {
+      case None =>
+        val fileSize: Long = file.length()
+        val (start: Int, end: Long, contentLength: Long) = getSize(rangeHeader, fileSize)
+        logger.info(s"streaming: $start-$end/$contentLength")
+        (getSource(file, start, end), FileSize(start, end, fileSize))
+      case Some(fileStub) =>
+        logger.error(s"File read error: $fileName")
+        (fileStub, FileSize(0, 0, 0))
+    }
+  }
+
+  private def anyErrorWithFile(file: File) = {
+    if (file.exists() && file.isFile && file.canRead) None
+    else Some(emptySource)
   }
 
   private def getSource(file: File, start: Int, end: Long) = {
-    val fileSource: Source[ByteString, Future[IOResult]] =
-      if (ifMobile(end)) getTwoBiteSource
-      else FileIO.fromPath(file.toPath, buffer, start)
-    fileSource
+    if (ifMobile(end)) twoBiteSource
+    else FileIO.fromPath(file.toPath, buffer, start)
   }
 
   private def getSize(rangeHeader: String, fileSize: Long) = {
@@ -41,7 +49,10 @@ class FileStreamer extends VideoStreamer {
     (start, end, contentLength)
   }
 
-  private def getTwoBiteSource = Source.single(byteString)
+  private def emptySource =
+    Source.single(ByteString.empty).mapMaterializedValue(_ => Future.successful(IOResult.createSuccessful(0)))
+
+  private def twoBiteSource = Source.single(byteString)
     .mapMaterializedValue(_ => Future.successful(IOResult.createSuccessful(2)))
 
   private def ifMobile(end: Long) = end == 1

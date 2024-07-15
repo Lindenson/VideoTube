@@ -21,6 +21,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http-spray-json" % "10.6.3",
   "com.github.jwt-scala" %% "jwt-core" % "10.0.1",
   "com.github.jwt-scala" %% "jwt-circe" % "10.0.1",
+  "com.github.ben-manes.caffeine" % "caffeine" % "3.1.8",
   "org.slf4j" % "slf4j-simple" % "1.7.36"
 )
 

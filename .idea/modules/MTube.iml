@@ -13,9 +13,11 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="sbt: scala-sdk-3.4.2" level="project" />
+    <orderEntry type="library" name="sbt: com.github.ben-manes.caffeine:caffeine:3.1.8:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.jwt-scala:jwt-circe_3:10.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.jwt-scala:jwt-core_3:10.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: com.github.jwt-scala:jwt-json-common_3:10.0.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.google.errorprone:error_prone_annotations:2.21.1:jar" level="project" />
     <orderEntry type="library" name="sbt: com.hierynomus:asn-one:0.6.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lightbend.akka:akka-stream-alpakka-slick_3:8.0.0:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe.akka:akka-actor-typed_3:2.9.3:jar" level="project" />
