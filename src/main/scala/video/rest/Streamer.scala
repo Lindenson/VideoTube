@@ -24,7 +24,7 @@ def streamVideo(fileID: Int): Route =
   pathEnd {
     get {
       extractRequestContext { ctx =>
-        logRequest("GET-VIDEO", Logging.InfoLevel) {
+        logRequest("GET-VIDEO", Logging.DebugLevel) {
           optionalHeaderValueByName("Range") {
             case None => complete(StatusCodes.RangeNotSatisfiable)
             case Some(range) =>

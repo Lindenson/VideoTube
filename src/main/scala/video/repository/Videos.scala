@@ -28,7 +28,7 @@ def saveVideo(video: Video)(implicit ec: ExecutionContext): Future[Int] = {
 def findAllVideos(offset: Long, limit: Long)(implicit ec: ExecutionContext): Future[Seq[Video]] = {
   val cacheKey = s"allVideos-$offset-$limit"
   CacheManager.get[Seq[Video]](cacheKey).fold {
-    val result = db.run(videos.sortBy(_.name.desc).drop(offset).take(limit).result)
+    val result = db.run(videos.sortBy(_.name.desc).drop(offset).take(limit - offset + 1).result)
     result.andThen {
       case scala.util.Success(videos) => CacheManager.put(cacheKey, videos)
       case scala.util.Failure(exception) => logger.error(s"Error in database $exception")

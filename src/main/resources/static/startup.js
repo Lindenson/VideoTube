@@ -9,7 +9,8 @@ new Vue({
             id: i + 1,
             src: `files/${i + 1}#t=0.1`,
             tag: '',
-            name: ''
+            name: '',
+            exists: true,
         })),
         toasts: [],
         toastType: true,
@@ -49,7 +50,7 @@ new Vue({
         },
         showToast(title, body, good = true) {
             this.toastType = good;
-            this.toasts.push({ title, body });
+            this.toasts.push({title, body});
             this.$nextTick(() => {
                 const toastElements = this.$refs.toasts;
                 const lastToast = toastElements[toastElements.length - 1];
@@ -61,36 +62,6 @@ new Vue({
         },
         removeToast(index) {
             this.toasts.splice(index, 1);
-        },
-        setupVideoControls() {
-            var pauseDebounceTimer;
-            var videos = document.getElementsByTagName("video");
-            for (var i = 0; i < videos.length; i++) {
-                videos[i].addEventListener("click", this.handleVideoClick);
-                videos[i].addEventListener("playing", this.handleVideoPlaying);
-                videos[i].addEventListener("pause", (event) => this.handleVideoPause(event, pauseDebounceTimer));
-            }
-        },
-        handleVideoClick(event) {
-            if (event.target.paused) {
-                event.target.play();
-            }
-        },
-        handleVideoPlaying(event) {
-            if (!event.target.hasAttribute("controls")) {
-                event.target.setAttribute("controls", "controls");
-            }
-        },
-        handleVideoPause(event, pauseDebounceTimer) {
-            if (pauseDebounceTimer) {
-                clearTimeout(pauseDebounceTimer);
-            }
-            pauseDebounceTimer = setTimeout(() => {
-                if (event.target.hasAttribute("controls")) {
-                    event.target.removeAttribute("controls");
-                    event.target.pause();
-                }
-            }, 50);
         },
         pageUp() {
             if (!this.existsMore) return;
@@ -107,13 +78,6 @@ new Vue({
             this.currentPage = 0;
             this.fetchVideos();
         },
-        updateVideos() {
-            this.videos.forEach((video, index) => {
-                const newId = index + 1 + this.currentPage * 6;
-                video.src = `files/${newId}#t=0.1`;
-            });
-            renewVideoTags();
-        },
         fetchVideos() {
             axios.get(`/names/${this.currentPage}`)
                 .then(response => {
@@ -124,18 +88,26 @@ new Vue({
                         if (updatedVideos[index]) {
                             video.name = updatedVideos[index].name;
                             video.tag = updatedVideos[index].tag;
+                            video.exists = true;
+                            const newId = index + 1 + this.currentPage * 6;
+                            video.src = `files/${newId}#t=0.1`;
+                        } else {
+                            video.exists = false;
+                            video.name = '';
+                            video.tag = '';
+                            video.src = ''
                         }
                     });
-                    this.updateVideos();
+                    renewVideoTags();
                 })
                 .catch(error => {
                     console.error("Error fetching videos:", error);
-                    this.showToast('Error', 'Failed to load videos', false);
+                    this.showToast('Sever error', 'Failed to load videos', false);
                 });
-        }
+        },
     },
     mounted() {
-        this.setupVideoControls();
         this.fetchVideos();
+        setupVideoControls();
     }
 });

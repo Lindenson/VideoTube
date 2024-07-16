@@ -6,14 +6,12 @@ import akka.http.scaladsl.model.StatusCodes.InternalServerError
 import akka.http.scaladsl.server.Directives.*
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import org.slf4j.LoggerFactory
-import spray.json.DefaultJsonProtocol.{BooleanJsonFormat, immSeqFormat, tuple2Format}
-import spray.json.enrichAny
 import video.dto.*
-import video.repository.findAllVideos
+import video.rest.Pager.getVideoNamesPage
 import video.security.{checkCredentialsAndGenerateToken, checkTokenAndGo}
 
 
-object Controller extends SprayJsonSupport with UserProtocol with VideoNamesProtocol {
+object Controller extends SprayJsonSupport with UserProtocol {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -54,15 +52,7 @@ object Controller extends SprayJsonSupport with UserProtocol with VideoNamesProt
           get {
             extractRequestContext { ctx =>
               implicit val ec = ctx.executionContext
-              val (from, to) = (limit * 6, (limit * 6) + 6)
-              onComplete(findAllVideos(from, to)) {
-                case scala.util.Success(videos) =>
-                  val existMore = videos.size > 6
-                  val videoNames = (videos.take(6).map(v => VideoNames(v.name, v.videoTag)), existMore)
-                  complete(HttpResponse(StatusCodes.OK, entity = HttpEntity(ContentTypes.`application/json`, videoNames.toJson.toString)))
-                case scala.util.Failure(exception) =>
-                  complete(HttpResponse(StatusCodes.InternalServerError, entity = s"An error occurred: ${exception.getMessage}"))
-              }
+              getVideoNamesPage(limit)
             }
           }
         }

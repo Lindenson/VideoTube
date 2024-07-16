@@ -9,14 +9,17 @@ import scala.concurrent.{ExecutionContext, Future}
 
 private val appConfig = ConfigFactory.load("application.conf")
 private val dirWithVideo: String = appConfig.getString("akka.videoDir")
+val pageSize = 6
+
 
 def nameFromID(fileID: Int)(implicit ec: ExecutionContext): Future[String] = {
-  val from: Int = fileID / 6
-  val to: Int = from + 5
-  findAllVideos(from, to)
-    .map(videoSeq => videoSeq.slice(fileID - 1, fileID))
-    .map(video => video.head.fileName)
-    .map(name => s"$dirWithVideo/$name")
+  val from = ((fileID - 1) / pageSize) * pageSize
+  val to = from + pageSize
+  val index : Int = (fileID - 1) % pageSize
+  findAllVideos(from, to).map { videoSeq =>
+    val video = videoSeq(index)
+    s"$dirWithVideo/${video.fileName}"
+  }
 }
 
 def nameToSave(name: String, tag: String)(implicit ec: ExecutionContext): Future[String] = {

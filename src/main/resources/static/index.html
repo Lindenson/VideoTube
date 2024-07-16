@@ -49,11 +49,11 @@
             <div class="row flex-grow-1 m-0">
                 <div v-for="video in videos" :key="video.id"
                      class="col-6 col-lg-4 video-wrapper d-flex flex-column align-items-center">
-                    <video loop playsinline>
+                    <video v-show="video.exists" loop playsinline>
                         <source :src="video.src" type="video/mp4">
                         Update your browser to one from XXI century
                     </video>
-                    <div class="video-details text-center mt-2">
+                    <div v-show="video.exists" class="video-details text-center mt-2">
                         <p class="vtag">{{ video.tag }}</p>
                         <p class="vname">{{ video.name }}</p>
                     </div>
