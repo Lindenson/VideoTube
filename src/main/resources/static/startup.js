@@ -87,15 +87,14 @@ new Vue({
                     video.tag = updatedVideos[index].tag;
                     video.exists = true;
                     const newId = index + 1 + this.currentPage * 6;
-                    video.src = `files/${newId}#t=0.01${this.refreshMarker}`;
+                    video.src = `files/${newId}#t=0.1?v=${this.refreshMarker}`;
                 } else {
                     video.exists = false;
-                    video.name = '';
-                    video.tag = '';
-                    video.src = ''
+                    video.src = '';
                 }
             });
         }, fetchVideos() {
+            setSpinner();
             axios.get(`/names/${this.currentPage}`)
                 .then(response => {
                     const updatedVideos = response.data[0];

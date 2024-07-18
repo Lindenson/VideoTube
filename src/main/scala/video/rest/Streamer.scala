@@ -2,7 +2,7 @@ package video.rest
 
 import akka.event.Logging
 import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.model.{HttpEntity, HttpResponse, MediaTypes, StatusCodes}
+import akka.http.scaladsl.model.{DateTime, HttpEntity, HttpHeader, HttpResponse, MediaTypes, StatusCodes}
 import akka.http.scaladsl.server.Directives.{complete, extractRequestContext, get, logRequest, onComplete, optionalHeaderValueByName, pathEnd}
 import akka.http.scaladsl.server.Route
 import video.api.VideoStreamer
@@ -12,10 +12,15 @@ import video.files.nameFromID
 private val streamer: VideoStreamer = VideoStreamer.getStreamer
 
 private def getHeaders(fileSize: FileSize) = {
-  val headers = List(
-    RawHeader("content-range", s"bytes ${fileSize.start}-${fileSize.end}/${fileSize.contentLength}"),
-    RawHeader("cache-control", "public, max-age=31536000"),
-    RawHeader("Accept-Ranges", "bytes")
+  val headers: List[HttpHeader] = List(
+    RawHeader("Content-Range", s"bytes ${fileSize.start}-${fileSize.end}/${fileSize.contentLength}"),
+    RawHeader("Cache-Control", "public, max-age=31536000"),
+    RawHeader("Accept-Ranges", "bytes"),
+    RawHeader("ETag", "your_unique_etag"), // Replace with a unique ETag for your content
+    RawHeader("Last-Modified", DateTime.now.toRfc1123DateTimeString),
+    RawHeader("Expires", (DateTime.now + 31536000).toRfc1123DateTimeString),
+    RawHeader("Vary", "Accept-Encoding"),
+    RawHeader("Content-Disposition", "inline")
   )
   headers
 }

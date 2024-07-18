@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class FileStreamer extends VideoStreamer {
 
-  private val buffer: Int = 4048
+  private val buffer: Int = 8096
   private val logger = LoggerFactory.getLogger(getClass)
   private val byteString: ByteString = ByteString(0x12.toByte, 0x34.toByte)
 
@@ -23,7 +23,7 @@ class FileStreamer extends VideoStreamer {
       case None =>
         val fileSize: Long = file.length()
         val (start: Int, end: Long, contentLength: Long) = getSize(rangeHeader, fileSize)
-        logger.info(s"streaming: $start-$end/$contentLength")
+        logger.debug(s"streaming: $start-$end/$contentLength")
         (getSource(file, start, end), FileSize(start, end, fileSize))
       case Some(fileStub) =>
         logger.error(s"File read error: $fileName")
