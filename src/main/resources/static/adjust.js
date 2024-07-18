@@ -1,11 +1,6 @@
 
 let pauseDebounceTimer;
 
-function resizeHeight() {
-    const vh = window.innerHeight * 0.01;
-    document.getElementById('app').style.height = `${vh*100}px`;
-    document.getElementById('footer').style.maxHeight = '3em';
-}
 
 function setupVideoControls() {
     let videos = document.getElementsByTagName("video");
@@ -36,26 +31,28 @@ function handleVideoPause(event, pauseDebounceTimer) {
         if (event.target.hasAttribute("controls")) {
             event.target.removeAttribute("controls");
             event.target.pause();
+            this.resizeWindowHeight()
         }
-    }, 50);
+    }, 70);
 }
 
 function renewVideoTags() {
     const videos = document.getElementsByTagName('video');
     for (let i = 0; i < videos.length; i++) {
-        const currentTime = new Date().getTime(); // Get current timestamp
-        const source = videos[i].getElementsByTagName('source')[0]
-        const originalSrc = source.src
-        const newSrc = `${originalSrc}?t=${currentTime}`;
-        source.setAttribute('src', newSrc);
         videos[i].load();
         videos[i].pause();
     }
 }
 
-window.addEventListener('load', resizeHeight);
-window.addEventListener('resize', resizeHeight);
-window.addEventListener('orientationchange', resizeHeight);
+function resizeWindowHeight(event) {
+    const vh = window.innerHeight * 0.01;
+    document.getElementById('app').style.height = `${vh*100}px`;
+    document.getElementById('footer').style.maxHeight = '3em';
+    console.log("resized!")
+}
 
-resizeHeight()
 
+window.addEventListener('load', resizeWindowHeight);
+window.addEventListener('resize', resizeWindowHeight);
+window.addEventListener('orientationchange', resizeWindowHeight);
+resizeWindowHeight();

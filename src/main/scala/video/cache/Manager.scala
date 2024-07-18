@@ -7,7 +7,7 @@ object Manager {
   import com.github.benmanes.caffeine.cache.{Caffeine, Cache}
 
   private val maxCacheSize = 100
-  private val maxCacheAge = 120
+  private val maxCacheAge = 5
   
   object CacheManager {
     

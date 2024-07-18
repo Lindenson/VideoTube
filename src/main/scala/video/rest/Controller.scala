@@ -8,6 +8,7 @@ import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import org.slf4j.LoggerFactory
 import video.dto.*
 import video.rest.Pager.getVideoNamesPage
+import video.rest.TextSearch.fullTextSearch
 import video.security.{checkCredentialsAndGenerateToken, checkTokenAndGo}
 
 
@@ -54,6 +55,11 @@ object Controller extends SprayJsonSupport with UserProtocol {
               implicit val ec = ctx.executionContext
               getVideoNamesPage(limit)
             }
+          }
+        },
+        path("search") {
+          parameters("name") { query =>
+            fullTextSearch(query)
           }
         }
       )

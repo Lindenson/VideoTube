@@ -3,7 +3,7 @@ package video.rest
 import akka.event.Logging
 import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.model.{HttpEntity, HttpResponse, MediaTypes, StatusCodes}
-import akka.http.scaladsl.server.Directives.{complete, concat, extractRequestContext, get, logRequest, onComplete, optionalHeaderValueByName, pathEnd}
+import akka.http.scaladsl.server.Directives.{complete, extractRequestContext, get, logRequest, onComplete, optionalHeaderValueByName, pathEnd}
 import akka.http.scaladsl.server.Route
 import video.api.VideoStreamer
 import video.dto.FileSize
@@ -31,7 +31,7 @@ def streamVideo(fileID: Int): Route =
               onComplete(nameFromID(fileID)(ctx.executionContext)) {
                 case scala.util.Success(fileName) =>
                   val (source, fileSize) = streamer.stream(range, fileName)
-                  val responseEntity = HttpEntity(MediaTypes.`video/mp4`, source)
+                  val responseEntity = HttpEntity(MediaTypes.`video/mpeg`, source)
                   val entity = HttpResponse(StatusCodes.PartialContent, getHeaders(fileSize), responseEntity)
                   complete(entity)
                 case scala.util.Failure(exception) =>

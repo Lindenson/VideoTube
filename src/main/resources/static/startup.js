@@ -7,7 +7,7 @@ new Vue({
     data: {
         videos: Array(6).fill().map((_, i) => ({
             id: i + 1,
-            src: `files/${i + 1}#t=0.1`,
+            src: '',
             tag: '',
             name: '',
             exists: true,
@@ -17,6 +17,7 @@ new Vue({
         uploadDisabled: true,
         currentPage: 0,
         existsMore: true,
+        refreshMarker: ''
     },
     methods: {
         showLoginForm() {
@@ -46,6 +47,7 @@ new Vue({
                 return;
             }
             this.showToast('Upload', result);
+            this.needRefresh();
             this.fetchVideos();
         },
         showToast(title, body, good = true) {
@@ -78,26 +80,28 @@ new Vue({
             this.currentPage = 0;
             this.fetchVideos();
         },
-        fetchVideos() {
+        updateVideoTags(updatedVideos) {
+            this.videos.forEach((video, index) => {
+                if (updatedVideos[index]) {
+                    video.name = updatedVideos[index].name;
+                    video.tag = updatedVideos[index].tag;
+                    video.exists = true;
+                    const newId = index + 1 + this.currentPage * 6;
+                    video.src = `files/${newId}#t=0.01${this.refreshMarker}`;
+                } else {
+                    video.exists = false;
+                    video.name = '';
+                    video.tag = '';
+                    video.src = ''
+                }
+            });
+        }, fetchVideos() {
             axios.get(`/names/${this.currentPage}`)
                 .then(response => {
                     const updatedVideos = response.data[0];
                     this.existsMore = response.data[1];
                     if (updatedVideos.length === 0) return;
-                    this.videos.forEach((video, index) => {
-                        if (updatedVideos[index]) {
-                            video.name = updatedVideos[index].name;
-                            video.tag = updatedVideos[index].tag;
-                            video.exists = true;
-                            const newId = index + 1 + this.currentPage * 6;
-                            video.src = `files/${newId}#t=0.1`;
-                        } else {
-                            video.exists = false;
-                            video.name = '';
-                            video.tag = '';
-                            video.src = ''
-                        }
-                    });
+                    this.updateVideoTags(updatedVideos);
                     renewVideoTags();
                 })
                 .catch(error => {
@@ -105,8 +109,12 @@ new Vue({
                     this.showToast('Sever error', 'Failed to load videos', false);
                 });
         },
+        needRefresh(){
+            this.refreshMarker = new Date().getTime();
+        },
     },
     mounted() {
+        this.needRefresh();
         this.fetchVideos();
         setupVideoControls();
     }

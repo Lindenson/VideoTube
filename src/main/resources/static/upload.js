@@ -47,7 +47,7 @@ Vue.component('upload-file-modal', {
         return {
             fileName: '',
             file: null,
-            tagOptions: ['sport', 'home', 'friends'],
+            tagOptions: ['sport', 'home', 'friends', 'nature'],
             selectedTag: '',
             fileTypeError: false,
             fileSizeError: false,
@@ -60,12 +60,12 @@ Vue.component('upload-file-modal', {
         },
         checkFileType(event) {
             const file = event.target.files[0];
-            this.fileTypeError = file.type !== 'video/mp4';
-            this.fileSizeError = file.size > 20000000; // 20 MB limit
+            this.fileTypeError = file.type !== 'video/quicktime' && 'video/mp4';
+            this.fileSizeError = file.size > 40000000; // 40 MB limit
         },
         async submitForm() {
             if (this.fileTypeError) {
-                this.$emit('upload', 'Only MPEG4 files are allowed.');
+                this.$emit('upload', 'Only MOV or MP4 files are allowed.');
                 return;
             }
             if (this.fileSizeError) {
